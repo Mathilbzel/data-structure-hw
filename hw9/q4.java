@@ -1,6 +1,6 @@
 import java.util.LinkedList;
 
-
+/**Hash graph is a type of graph that is use to figure out where place vertices in a list*/
 @SuppressWarnings("unchecked") 
 public class HashGraph extends Graph{
     
@@ -8,24 +8,27 @@ public class HashGraph extends Graph{
     int x; // Small number (for PolyHash())
     
     public HashGraph(int cap, int p, int x){
-        super(cap);
+        super(cap);//Given capacity
         this.p = p;
         this.x = x;
     }
     
     public static int polyHash(String s, int p, int x){
         int hash = 0;
+        //Going through each character in the string to use the hash function
         for (int i=s.length()-1; i>=0; i--){
             hash = (hash*x + (int)s.charAt(i))%p;
         }
         return hash;
     }
     
+    //**Finds the index where a vertex should be placed */
     public int getListIndex(String s){
-        int index = HashGraph.polyHash(s,p,x) % cap;
+        int index = HashGraph.polyHash(s,p,x) % cap; //Hash the string to get index
+        //if the spot is empty or contain the same key then return index
         if (vertexList[index] == null || vertexList[index].strKey.equals(s))
             return index;
-        
+        //if there is 2 or more keys wants to go in the same spot in a list, keep moving+searching for an empty spot
         for (int k=1; k<cap; k++){
             index = (index + k) % cap;
             if (vertexList[index] == null || vertexList[index].strKey.equals(s))
@@ -34,23 +37,26 @@ public class HashGraph extends Graph{
         return index;
     }
 
+    //**Adds a new vertex to the graph */
     public void addVertex(String key){
+        //If the graph is full, print msg and stop
         if (size==cap){
             System.out.println("Vertex list is full. You need to rehash");
             return;
         }
-        int index = getListIndex(key);
+        int index = getListIndex(key); //Find where vertex should go
         vertexList[index] = new Vertex(key); // an Array of list contains many Lists
         adjacencyList[index] = new LinkedList(); // Add list object to the adjacency list
-        size++;
+        size++; //Increase the count of vertices in the graph
     }
-    
+    //**Adding edge (connection) between 2 vertices */
     public void addEdge(String source, String destination){
-        int u = getListIndex(source);
-        int v = getListIndex(destination);
-        super.addEdge(u, v);
+        int u = getListIndex(source); //Get index of the source vertex
+        int v = getListIndex(destination); //Get index of the destination vertex
+        super.addEdge(u, v); //Call the parent class's addEdge method
     }
     
+    //**Display all vertices in the graph */
     // This function is complete, no need to edit
     public void showVertexList(){
         for (int i=0; i<vertexList.length; i++){
@@ -89,6 +95,7 @@ public class HashGraph extends Graph{
 
   }
   
+  //** Do Depth-First Search on the graph */
   public void DFS(){
       
       // Set cc (connected component number) to 1
@@ -99,13 +106,14 @@ public class HashGraph extends Graph{
           if (vertexList[i] != null) {
               if (!vertexList[i].visited) {
                   Explore(vertexList[i]);
-                  cc++;
+                  cc++; // move to the next connected component
                   System.out.println();
               }
           }
       }
   }
 
+    //**Creates a sample graph with cities as vertices */
     public static HashGraph constructGraph3() {
         int p = 101111; // Big Prime (Hash key1)
         int x = 101;    // Small number (Hash key2)
@@ -116,7 +124,8 @@ public class HashGraph extends Graph{
         for (int i=0; i<16; i++){
             graph.addVertex(cities[i]);
         }
-                
+
+        //Add connections between cities     
         graph.addEdge("Dublin", "Edinburgh");
         graph.addEdge("Dublin", "London");                
         graph.addEdge("Dublin", "Lisbon");
@@ -141,6 +150,7 @@ public class HashGraph extends Graph{
         return graph;
     }
 
+    //**Creates another sample but this time using names as vertices */
     public static HashGraph constructGraph4() {
         int p = 101111; // Big Prime (Hash key1)
         int x = 101;    // Small number (Hash key2)
